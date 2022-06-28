@@ -168,7 +168,9 @@ function deleteBook(id){
 
 
 // Mapping search result into html
-function searchResult(book){
+function searchResult(book = []){
+    const bookResult = document.getElementById('searchResult')
+    bookResult.innerHTML = ''
     const result = book.map(({title, author, isCompleted, releaseYear}) => {
         const myArticle = document.createElement('article')
         myArticle.setAttribute('class', 'book_item')
@@ -177,11 +179,10 @@ function searchResult(book){
             <h3>${title}</h3>
             <p>Penulis: ${author}</p>
             <p>Tahun: ${releaseYear}</p>
+            <p>Rak: ${isCompleted ? 'Selesai dibaca' : 'Belum selesai dibaca'}</p>
         `
         return myArticle
     })
-
-    const bookResult = document.getElementById('searchResult')
 
     result.forEach(item => {
         bookResult.append(item)
@@ -220,24 +221,27 @@ inputBookForm.addEventListener('submit', function(e){
 
     // Reset form
     inputBookForm.reset()
+    
+    location.reload()
 })
 
 // Search Book 
 const searchBookForm = document.getElementById('searchBook')
 searchBookForm.addEventListener('submit', function(e){
     e.preventDefault();
-
+    
     if(localStorage.getItem(localStorageKey) === null){
        return alert('Buku tidak ada')
     }
 
     const searchInput = document.getElementById('searchBookTitle').value
 
-    const getResult = getDataFromLocalStorage().filter(book => {
-        if(book.title != searchInput){
-            return alert('Buku tidak ditemukan')
-        }else{
-            return book.title == searchInput
+    const getResult = getDataFromLocalStorage().filter((book) => {
+        const formattedTitle = book.title.toLowerCase()
+        const formattedInput = searchInput.toLowerCase()
+
+        if(formattedTitle.includes(formattedInput) || formattedTitle === formattedInput){
+            return book
         }
     })
 
